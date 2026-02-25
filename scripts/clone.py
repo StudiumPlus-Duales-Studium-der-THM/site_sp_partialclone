@@ -186,7 +186,12 @@ def rewrite_html(
                 img[attr] = rel
 
     for tag, attr, fallback_ext in (("link", "href", ".css"), ("script", "src", ".js")):
-        for el in soup.select(f"{tag}[{attr}]"):
+        # For link elements, restrict to stylesheet links to avoid rewriting non-stylesheet metadata links
+        if tag == "link":
+            selector = 'link[rel~="stylesheet"][href]'
+        else:
+            selector = f"{tag}[{attr}]"
+        for el in soup.select(selector):
             src = (el.get(attr) or "").strip()
             if not src:
                 continue
