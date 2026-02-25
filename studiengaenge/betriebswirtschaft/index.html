@@ -251,6 +251,25 @@ h1 {
 h2 {
   font-size: 2rem;
   font-size: clamp(2rem, 3vw, 2.75rem);
+}
+
+.flyntComponent[is="flynt-hero-image-header"] .container-background {
+	min-height: clamp(180px, 30vh, 340px) !important;
+	max-height: clamp(180px, 30vh, 340px) !important;
+	overflow: hidden !important;
+}
+
+.flyntComponent[is="flynt-hero-image-header"] .container-background > figure {
+	height: 100% !important;
+	background-position: center !important;
+	background-size: cover !important;
+}
+
+@media (max-width: 768px) {
+	.flyntComponent[is="flynt-hero-image-header"] .container-background {
+		min-height: clamp(140px, 24vh, 220px) !important;
+		max-height: clamp(140px, 24vh, 220px) !important;
+	}
 }		</style>
 </head>
 <body class="">
