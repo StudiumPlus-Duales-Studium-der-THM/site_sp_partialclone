@@ -26,10 +26,16 @@ REGISTRY_PATH = "registry.json"
 SHARED_ASSETS_DIR = "_shared_assets"
 COMMENT_TEMPLATE = "<!-- Cloned from: {source_url} at {timestamp} -->\n"
 MAX_DOWNLOAD_BYTES = 15 * 1024 * 1024
+CSS_URL_PATTERN = re.compile(r"url\(\s*(['\"]?)(.*?)\1\s*\)", re.IGNORECASE)
 
 
 def utc_now_iso() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return (
+        datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 def normalize_url(url: str) -> str:
@@ -40,7 +46,9 @@ def normalize_url(url: str) -> str:
     path = re.sub(r"/+", "/", path)
     if not path.endswith("/") and not posixpath.splitext(path)[1]:
         path += "/"
-    return urlunparse((parsed.scheme or "https", parsed.netloc or "studiumplus.de", path, "", "", ""))
+    return urlunparse(
+        (parsed.scheme or "https", parsed.netloc or "studiumplus.de", path, "", "", "")
+    )
 
 
 def normalize_domain(url: str) -> str:
@@ -64,7 +72,9 @@ def page_file_from_url(url: str, output_dir: Path) -> Path:
 
 def to_local_page_ref(current_page: Path, target_url: str, output_dir: Path) -> str:
     target_path = page_file_from_url(target_url, output_dir)
-    rel = posixpath.relpath(target_path.as_posix(), start=current_page.parent.as_posix())
+    rel = posixpath.relpath(
+        target_path.as_posix(), start=current_page.parent.as_posix()
+    )
     return rel
 
 
@@ -93,7 +103,9 @@ def safe_filename_from_url(url: str, fallback_ext: str = ".bin") -> str:
 
 
 def download_binary(url: str) -> Optional[bytes]:
-    req = Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; StudiumPlusClone/1.0)"})
+    req = Request(
+        url, headers={"User-Agent": "Mozilla/5.0 (compatible; StudiumPlusClone/1.0)"}
+    )
     try:
         with urlopen(req, timeout=30) as response:
             content_length = response.headers.get("Content-Length")
@@ -108,12 +120,86 @@ def download_binary(url: str) -> Optional[bytes]:
                     break
                 total += len(chunk)
                 if total > MAX_DOWNLOAD_BYTES:
-                    logging.warning("Skip oversized asset while reading (%s bytes): %s", total, url)
+                    logging.warning(
+                        "Skip oversized asset while reading (%s bytes): %s", total, url
+                    )
                     return None
                 chunks.append(chunk)
             return b"".join(chunks)
     except Exception:
         return None
+
+
+def decode_text(binary: bytes) -> str:
+    for encoding in ("utf-8", "latin-1"):
+        try:
+            return binary.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    return binary.decode("utf-8", errors="replace")
+
+
+def resolve_css_asset_url(css_url: str, raw_url: str) -> Optional[str]:
+    candidate = raw_url.strip()
+    lowered = candidate.lower()
+    if not candidate:
+        return None
+    if lowered.startswith(("data:", "about:", "javascript:", "mailto:", "tel:")):
+        return None
+    if lowered.startswith("var("):
+        return None
+    if candidate.startswith(("#", "%23")):
+        return None
+    resolved = urljoin(css_url, candidate)
+    return resolved if is_internal_studiumplus(resolved) else None
+
+
+def rewrite_css(
+    css_text: str,
+    css_url: str,
+    css_target: Path,
+    shared_assets_dir: Path,
+) -> str:
+    resolved_cache: Dict[str, Optional[str]] = {}
+
+    def replace_url(match: re.Match) -> str:
+        quote = match.group(1) or ""
+        raw_url = (match.group(2) or "").strip()
+        resolved = resolve_css_asset_url(css_url, raw_url)
+        if not resolved:
+            return match.group(0)
+
+        parsed = urlparse(resolved)
+        cache_key = urlunparse(
+            (parsed.scheme, parsed.netloc, parsed.path, parsed.params, parsed.query, "")
+        )
+        local_ref = resolved_cache.get(cache_key)
+        if local_ref is None:
+            ext = posixpath.splitext(parsed.path)[1].lower()
+            filename = safe_filename_from_url(cache_key, fallback_ext=ext or ".bin")
+            target = shared_assets_dir / filename
+            if not target.exists():
+                binary = download_binary(cache_key)
+                if not binary:
+                    logging.warning("Failed CSS asset download: %s", cache_key)
+                    resolved_cache[cache_key] = ""
+                    return match.group(0)
+                target.write_bytes(binary)
+
+            local_ref = posixpath.relpath(
+                target.as_posix(), start=css_target.parent.as_posix()
+            )
+            resolved_cache[cache_key] = local_ref
+
+        if not local_ref:
+            return match.group(0)
+
+        fragment = urlparse(raw_url).fragment
+        if fragment:
+            local_ref = f"{local_ref}#{fragment}"
+        return f"url({quote}{local_ref}{quote})"
+
+    return CSS_URL_PATTERN.sub(replace_url, css_text)
 
 
 def click_cookie_banner(page) -> None:
@@ -128,7 +214,9 @@ def click_cookie_banner(page) -> None:
         "Accept",
     ]
     for label in labels:
-        loc = page.get_by_role("button", name=re.compile(re.escape(label), re.IGNORECASE))
+        loc = page.get_by_role(
+            "button", name=re.compile(re.escape(label), re.IGNORECASE)
+        )
         try:
             if loc.count() > 0:
                 loc.first.click(timeout=1200)
@@ -149,14 +237,21 @@ def read_registry(path: Path) -> Dict:
 
 def write_registry(path: Path, registry: Dict) -> None:
     registry["last_updated"] = utc_now_iso()
-    path.write_text(json.dumps(registry, ensure_ascii=False, indent=2), encoding="utf-8")
+    path.write_text(
+        json.dumps(registry, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
 
 
 def collect_links(html: str, base_url: str) -> Iterable[str]:
     soup = BeautifulSoup(html, "lxml")
     for a in soup.select("a[href]"):
         href = (a.get("href") or "").strip()
-        if not href or href.startswith("#") or href.startswith("mailto:") or href.startswith("tel:"):
+        if (
+            not href
+            or href.startswith("#")
+            or href.startswith("mailto:")
+            or href.startswith("tel:")
+        ):
             continue
         absolute = normalize_url(urljoin(base_url, href))
         yield absolute
@@ -175,7 +270,12 @@ def rewrite_html(
     page_assets_dir.mkdir(parents=True, exist_ok=True)
 
     for img in soup.select("img"):
-        candidates = [img.get("src"), img.get("data-src"), img.get("data-lazy-src"), img.get("srcset")]
+        candidates = [
+            img.get("src"),
+            img.get("data-src"),
+            img.get("data-lazy-src"),
+            img.get("srcset"),
+        ]
         source_candidate = next((c for c in candidates if c), None)
         if not source_candidate:
             continue
@@ -216,18 +316,37 @@ def rewrite_html(
                 continue
             filename = safe_filename_from_url(resolved, fallback_ext=fallback_ext)
             target = shared_assets_dir / filename
-            if not target.exists():
+
+            if tag == "link":
+                binary = download_binary(resolved)
+                if binary:
+                    css_text = decode_text(binary)
+                    rewritten_css = rewrite_css(
+                        css_text, resolved, target, shared_assets_dir
+                    )
+                    target.write_text(rewritten_css, encoding="utf-8")
+                elif not target.exists():
+                    logging.warning("Failed shared asset download: %s", resolved)
+                    continue
+            elif not target.exists():
                 binary = download_binary(resolved)
                 if not binary:
                     logging.warning("Failed shared asset download: %s", resolved)
                     continue
                 target.write_bytes(binary)
-            rel = posixpath.relpath(target.as_posix(), start=page_file.parent.as_posix())
+            rel = posixpath.relpath(
+                target.as_posix(), start=page_file.parent.as_posix()
+            )
             el[attr] = rel
 
     for a in soup.select("a[href]"):
         href = (a.get("href") or "").strip()
-        if not href or href.startswith("#") or href.startswith("mailto:") or href.startswith("tel:"):
+        if (
+            not href
+            or href.startswith("#")
+            or href.startswith("mailto:")
+            or href.startswith("tel:")
+        ):
             continue
         resolved = normalize_url(urljoin(page_url, href))
         if in_area(resolved, start_prefix):
@@ -283,7 +402,9 @@ def crawl_area(
         try:
             response = page.goto(current_url, wait_until="networkidle", timeout=45000)
             if response and response.status >= 400:
-                logging.warning("Skip %s due to status %s", current_url, response.status)
+                logging.warning(
+                    "Skip %s due to status %s", current_url, response.status
+                )
                 continue
             click_cookie_banner(page)
             page.wait_for_timeout(500)
@@ -304,7 +425,9 @@ def crawl_area(
             except Exception:
                 logging.warning("Could not create thumbnail for %s", current_url)
 
-        rewritten = rewrite_html(html, current_url, output_dir, prefix, shared_assets_dir)
+        rewritten = rewrite_html(
+            html, current_url, output_dir, prefix, shared_assets_dir
+        )
         target_file = page_file_from_url(current_url, output_dir)
         ensure_parent(target_file)
         target_file.write_text(rewritten, encoding="utf-8")
@@ -350,10 +473,14 @@ def upsert_area(registry: Dict, area: Dict) -> None:
 
 
 def parse_args(argv: List[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Partieller StudiumPlus-Klon mit Playwright")
+    parser = argparse.ArgumentParser(
+        description="Partieller StudiumPlus-Klon mit Playwright"
+    )
     parser.add_argument("urls", nargs="+", help="Start-URLs der zu klonenden Bereiche")
     parser.add_argument("--max-depth", type=int, default=5, help="Maximale Crawl-Tiefe")
-    parser.add_argument("--delay", type=float, default=1.0, help="Wartezeit zwischen Seiten in Sekunden")
+    parser.add_argument(
+        "--delay", type=float, default=1.0, help="Wartezeit zwischen Seiten in Sekunden"
+    )
     parser.add_argument("--output-dir", default=".", help="Ausgabeordner")
     return parser.parse_args(argv)
 
@@ -368,7 +495,10 @@ def main(argv: List[str]) -> int:
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s [%(levelname)s] %(message)s",
-        handlers=[logging.FileHandler(log_path, encoding="utf-8"), logging.StreamHandler(sys.stdout)],
+        handlers=[
+            logging.FileHandler(log_path, encoding="utf-8"),
+            logging.StreamHandler(sys.stdout),
+        ],
     )
 
     registry = read_registry(registry_path)
@@ -380,7 +510,14 @@ def main(argv: List[str]) -> int:
             for raw_url in args.urls:
                 start_url = normalize_url(raw_url)
                 logging.info("Cloning area: %s", start_url)
-                area = crawl_area(browser, start_url, output_dir, args.max_depth, args.delay, thumbnails_dir)
+                area = crawl_area(
+                    browser,
+                    start_url,
+                    output_dir,
+                    args.max_depth,
+                    args.delay,
+                    thumbnails_dir,
+                )
                 upsert_area(registry, area)
         finally:
             browser.close()
