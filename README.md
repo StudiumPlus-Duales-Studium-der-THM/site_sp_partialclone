@@ -1,20 +1,79 @@
 # site_sp_partialclone
 
-**Kurzbeschreibung:** Partieller Klon ausgewählter Seiten und Unterseiten von studiumplus.de – nicht die gesamte Website, sondern gezielt besonders relevante Bereiche. Dient zum Verproben von Anpassungen und zu Demo-Zwecken.
+Partieller Klon ausgewählter Bereiche von [studiumplus.de](https://studiumplus.de) inklusive Viewer-Rahmenanwendung (Vanilla JS).
 
-## Ziel
+## Architektur
 
-Dieses Repository enthält einen partiellen Klon der Website [studiumplus.de](https://www.studiumplus.de). Es werden nicht alle Seiten der Website gespiegelt, sondern nur bestimmte Bereiche, die von besonderer Bedeutung sind – inklusive der jeweiligen Unterseiten.
+- `scripts/clone.py`: Playwright-basierter Bereichs-Klon (rekursiv im URL-Prefix)
+- `registry.json`: Manifest der geklonten Bereiche
+- `index.html`: Karten-Übersicht aller Bereiche
+- `viewer.html`: SPA mit Navigationsleiste + `iframe` für isolierte Darstellung
+- `assets/app.css`: Eigenes Styling für Übersicht und Viewer
 
-## Zweck
+## Setup
 
-- **Anpassungen verproben:** Änderungen an der Website können in diesem Repository getestet werden, ohne die Live-Seite zu beeinflussen.
-- **Demo-Zwecke:** Der Klon dient als Grundlage für Präsentationen und Demonstrationen.
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r scripts/requirements.txt
+playwright install chromium
+```
 
-## Inhalt
+## Bereiche klonen
 
-Der Klon umfasst ausgewählte Seiten und deren Unterseiten von studiumplus.de, die für das duale Studium an der THM (Technische Hochschule Mittelhessen) besonders relevant sind.
+Einzelner Bereich:
 
-## Hinweis
+```bash
+python scripts/clone.py https://studiumplus.de/duales-studium/vor-dem-studium/mein-weg-zu-studiumplus/
+```
 
-Dies ist kein vollständiger Klon der Website studiumplus.de. Es handelt sich um eine gezielte Auswahl relevanter Bereiche.
+Mehrere Bereiche:
+
+```bash
+python scripts/clone.py \
+  https://studiumplus.de/duales-studium/vor-dem-studium/studienangebot/ \
+  https://studiumplus.de/studiengaenge/betriebswirtschaft/ \
+  https://studiumplus.de/duales-studium/vor-dem-studium/freie-studienplaetze/ \
+  https://studiumplus.de/connect/ \
+  https://studiumplus.de/ueber-uns/downloads/ \
+  https://studiumplus.de/duales-studium/im-studium/infos-fuer-studierende/praxis-im-unternehmen/ \
+  https://studiumplus.de/ueber-uns/campus-team/ \
+  https://studiumplus.de/duales-studium/vor-dem-studium/mein-weg-zu-studiumplus/
+```
+
+Optionen:
+
+```bash
+python scripts/clone.py --max-depth 5 --delay 1.0 --output-dir . <URL ...>
+```
+
+## Lokal starten
+
+```bash
+python -m http.server
+```
+
+Danach:
+
+- Übersicht: `http://localhost:8000/index.html`
+- Viewer: `http://localhost:8000/viewer.html#<local_path>`
+
+## Verzeichnisstruktur (Kurzform)
+
+```text
+site_sp_partialclone/
+├── README.md
+├── registry.json
+├── index.html
+├── viewer.html
+├── assets/
+│   └── app.css
+├── thumbnails/
+├── _shared_assets/
+├── duales-studium/
+├── studiengaenge/
+└── scripts/
+    ├── clone.py
+    ├── requirements.txt
+    └── clone.log
+```

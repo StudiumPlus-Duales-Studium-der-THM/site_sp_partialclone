@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudiumPlus Viewer</title>
+  <link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+  <div id="viewer" class="viewer">
+    <header class="topbar">
+      <div>
+        <a href="index.html" style="color:#93c5fd">← Übersicht</a>
+        <div id="area-title"></div>
+        <small>Quelle: <a id="source-link" style="color:#c7d2fe" target="_blank" rel="noopener"></a></small>
+      </div>
+      <div class="topbar-actions">
+        <button id="hide-frame" type="button">Rahmen ausblenden</button>
+      </div>
+    </header>
+    <iframe id="preview" title="Klonvorschau"></iframe>
+  </div>
+  <button id="show-frame" class="floating-toggle" type="button" aria-label="Rahmen einblenden">≡</button>
+
+  <script>
+    const viewer = document.getElementById('viewer');
+    const iframe = document.getElementById('preview');
+    const areaTitle = document.getElementById('area-title');
+    const sourceLink = document.getElementById('source-link');
+
+    const normalizePath = (value = '') => value.replace(/^\/+/, '').replace(/index\.html$/, '');
+
+    function toIframePath(hashPath) {
+      const cleaned = normalizePath(hashPath);
+      if (!cleaned) return '';
+      if (/\.[a-z0-9]+$/i.test(cleaned)) return cleaned;
+      return cleaned.endsWith('/') ? `${cleaned}index.html` : `${cleaned}/index.html`;
+    }
+
+    function toSourceUrl(area, currentRelativePath) {
+      const local = normalizePath(area.local_path || '');
+      const current = normalizePath(currentRelativePath || local);
+      if (!current.startsWith(local)) return area.source_url;
+      const suffix = current.slice(local.length);
+      return new URL(suffix, area.source_url).toString();
+    }
+
+    async function loadRegistry() {
+      const response = await fetch('registry.json', { cache: 'no-store' });
+      return response.json();
+    }
+
+    function findAreaByPath(registry, path) {
+      const clean = normalizePath(path);
+      return (registry.areas || []).find(a => clean.startsWith(normalizePath(a.local_path || '')));
+    }
+
+    function openOutOfAreaLinksInNewTab(currentArea) {
+      try {
+        const doc = iframe.contentDocument;
+        if (!doc) return;
+        doc.addEventListener('click', (event) => {
+          const anchor = event.target.closest('a[href]');
+          if (!anchor) return;
+          const href = anchor.getAttribute('href');
+          if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+          const target = new URL(href, iframe.contentWindow.location.href);
+          const localPrefix = normalizePath(currentArea.local_path || '');
+          const localTarget = normalizePath(target.pathname);
+          if (!localTarget.startsWith(localPrefix)) {
+            event.preventDefault();
+            const sourceUrl = toSourceUrl(currentArea, localTarget);
+            window.open(sourceUrl, '_blank', 'noopener');
+          }
+        }, { capture: true });
+      } catch (_) {}
+    }
+
+    async function render() {
+      const registry = await loadRegistry();
+      const hashPath = normalizePath(location.hash.slice(1));
+      const area = findAreaByPath(registry, hashPath);
+      if (!area) {
+        areaTitle.textContent = 'Bereich nicht gefunden';
+        sourceLink.textContent = '';
+        iframe.removeAttribute('src');
+        return;
+      }
+
+      areaTitle.textContent = area.label;
+      sourceLink.href = area.source_url;
+      sourceLink.textContent = area.source_url;
+
+      const iframePath = toIframePath(hashPath || area.local_path);
+      iframe.src = iframePath;
+
+      iframe.onload = () => {
+        openOutOfAreaLinksInNewTab(area);
+        try {
+          const current = normalizePath(iframe.contentWindow.location.pathname);
+          sourceLink.href = toSourceUrl(area, current);
+          sourceLink.textContent = sourceLink.href;
+        } catch (_) {}
+      };
+    }
+
+    document.getElementById('hide-frame').addEventListener('click', () => viewer.classList.add('frame-hidden'));
+    document.getElementById('show-frame').addEventListener('click', () => viewer.classList.remove('frame-hidden'));
+    window.addEventListener('hashchange', render);
+    render().catch((error) => {
+      areaTitle.textContent = `Fehler: ${error.message}`;
+    });
+  </script>
+</body>
+</html>
