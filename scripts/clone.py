@@ -25,6 +25,7 @@ SUPPORTED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".svg", ".webp", ".gif"}
 REGISTRY_PATH = "registry.json"
 SHARED_ASSETS_DIR = "_shared_assets"
 COMMENT_TEMPLATE = "<!-- Cloned from: {source_url} at {timestamp} -->\n"
+MAX_DOWNLOAD_BYTES = 15 * 1024 * 1024
 
 
 def utc_now_iso() -> str:
@@ -95,7 +96,22 @@ def download_binary(url: str) -> Optional[bytes]:
     req = Request(url, headers={"User-Agent": "Mozilla/5.0 (compatible; StudiumPlusClone/1.0)"})
     try:
         with urlopen(req, timeout=30) as response:
-            return response.read()
+            content_length = response.headers.get("Content-Length")
+            if content_length and int(content_length) > MAX_DOWNLOAD_BYTES:
+                logging.warning("Skip large asset (%s bytes): %s", content_length, url)
+                return None
+            chunks: List[bytes] = []
+            total = 0
+            while True:
+                chunk = response.read(64 * 1024)
+                if not chunk:
+                    break
+                total += len(chunk)
+                if total > MAX_DOWNLOAD_BYTES:
+                    logging.warning("Skip oversized asset while reading (%s bytes): %s", total, url)
+                    return None
+                chunks.append(chunk)
+            return b"".join(chunks)
     except Exception:
         return None
 
