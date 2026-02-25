@@ -1,86 +1,179 @@
 {
   "source": "https://studiumplus.de",
-  "last_updated": "2026-02-25T16:34:09Z",
+  "last_updated": "2026-02-25T21:41:33Z",
   "areas": [
     {
       "id": "studienangebot",
-      "label": "Studienangebot",
+      "label": "Studienangebot - StudiumPlus",
       "source_url": "https://studiumplus.de/duales-studium/vor-dem-studium/studienangebot/",
       "local_path": "duales-studium/vor-dem-studium/studienangebot/",
       "thumbnail": "thumbnails/studienangebot.png",
-      "cloned_at": "2026-02-25T16:34:09Z",
-      "pages_count": 0,
-      "pages": []
+      "cloned_at": "2026-02-25T21:40:09Z",
+      "pages_count": 3,
+      "pages": [
+        {
+          "source_url": "https://studiumplus.de/duales-studium/vor-dem-studium/studienangebot/",
+          "local_path": "duales-studium/vor-dem-studium/studienangebot/index.html",
+          "title": "Studienangebot - StudiumPlus"
+        },
+        {
+          "source_url": "https://studiumplus.de/duales-studium/vor-dem-studium/studienangebot/bachelor-studiengaenge/",
+          "local_path": "duales-studium/vor-dem-studium/studienangebot/bachelor-studiengaenge/index.html",
+          "title": "Bachelor-Studiengänge - StudiumPlus"
+        },
+        {
+          "source_url": "https://studiumplus.de/duales-studium/vor-dem-studium/studienangebot/master-studiengaenge/",
+          "local_path": "duales-studium/vor-dem-studium/studienangebot/master-studiengaenge/index.html",
+          "title": "Master-Studiengänge - StudiumPlus"
+        }
+      ]
     },
     {
       "id": "betriebswirtschaft",
-      "label": "Betriebswirtschaft",
+      "label": "Dualer Bachelor Betriebswirtschaft in Hessen - StudiumPlus",
       "source_url": "https://studiumplus.de/studiengaenge/betriebswirtschaft/",
       "local_path": "studiengaenge/betriebswirtschaft/",
       "thumbnail": "thumbnails/betriebswirtschaft.png",
-      "cloned_at": "2026-02-25T16:34:09Z",
-      "pages_count": 0,
-      "pages": []
+      "cloned_at": "2026-02-25T21:40:34Z",
+      "pages_count": 5,
+      "pages": [
+        {
+          "source_url": "https://studiumplus.de/studiengaenge/betriebswirtschaft/",
+          "local_path": "studiengaenge/betriebswirtschaft/index.html",
+          "title": "Dualer Bachelor Betriebswirtschaft in Hessen - StudiumPlus"
+        },
+        {
+          "source_url": "https://studiumplus.de/studiengaenge/betriebswirtschaft/betriebswirtschaft-krankenversicherungsmanagement/",
+          "local_path": "studiengaenge/betriebswirtschaft/betriebswirtschaft-krankenversicherungsmanagement/index.html",
+          "title": "Krankenversicherungsmanagement AOK - BW dual bei StudiumPlus"
+        },
+        {
+          "source_url": "https://studiumplus.de/studiengaenge/betriebswirtschaft/betriebswirtschaft-logistikmanagement/",
+          "local_path": "studiengaenge/betriebswirtschaft/betriebswirtschaft-logistikmanagement/index.html",
+          "title": "Dual Logistikmanagement studieren bei StudiumPlus Hessen"
+        },
+        {
+          "source_url": "https://studiumplus.de/studiengaenge/betriebswirtschaft/betriebswirtschaft-mittelstandsmanagement/",
+          "local_path": "studiengaenge/betriebswirtschaft/betriebswirtschaft-mittelstandsmanagement/index.html",
+          "title": "Bachelor Betriebswirtschaft dual TH Mittelhessen - StudiumPlus"
+        },
+        {
+          "source_url": "https://studiumplus.de/studiengaenge/betriebswirtschaft/betriebswirtschaft-wirtschaftsinformatik/",
+          "local_path": "studiengaenge/betriebswirtschaft/betriebswirtschaft-wirtschaftsinformatik/index.html",
+          "title": "Wirtschaftsinformatik dualer Bachelor - StudiumPlus Hessen"
+        }
+      ]
     },
     {
       "id": "freie-studienplaetze",
-      "label": "Freie Studienplaetze",
+      "label": "Freie Studienplätze - StudiumPlus",
       "source_url": "https://studiumplus.de/duales-studium/vor-dem-studium/freie-studienplaetze/",
       "local_path": "duales-studium/vor-dem-studium/freie-studienplaetze/",
       "thumbnail": "thumbnails/freie-studienplaetze.png",
-      "cloned_at": "2026-02-25T16:34:09Z",
-      "pages_count": 0,
-      "pages": []
+      "cloned_at": "2026-02-25T21:40:47Z",
+      "pages_count": 1,
+      "pages": [
+        {
+          "source_url": "https://studiumplus.de/duales-studium/vor-dem-studium/freie-studienplaetze/",
+          "local_path": "duales-studium/vor-dem-studium/freie-studienplaetze/index.html",
+          "title": "Freie Studienplätze - StudiumPlus"
+        }
+      ]
     },
     {
       "id": "connect",
-      "label": "Connect",
+      "label": "Connect - StudiumPlus",
       "source_url": "https://studiumplus.de/connect/",
       "local_path": "connect/",
       "thumbnail": "thumbnails/connect.png",
-      "cloned_at": "2026-02-25T16:34:09Z",
-      "pages_count": 0,
-      "pages": []
+      "cloned_at": "2026-02-25T21:40:59Z",
+      "pages_count": 2,
+      "pages": [
+        {
+          "source_url": "https://studiumplus.de/connect/",
+          "local_path": "connect/index.html",
+          "title": "Connect - StudiumPlus"
+        },
+        {
+          "source_url": "https://studiumplus.de/connect/connect-praktikumplus/",
+          "local_path": "connect/connect-praktikumplus/index.html",
+          "title": "Connect: PraktikumPlus - StudiumPlus"
+        }
+      ]
     },
     {
       "id": "downloads",
-      "label": "Downloads",
+      "label": "Downloads - StudiumPlus",
       "source_url": "https://studiumplus.de/ueber-uns/downloads/",
       "local_path": "ueber-uns/downloads/",
       "thumbnail": "thumbnails/downloads.png",
-      "cloned_at": "2026-02-25T16:34:09Z",
-      "pages_count": 0,
-      "pages": []
+      "cloned_at": "2026-02-25T21:41:03Z",
+      "pages_count": 1,
+      "pages": [
+        {
+          "source_url": "https://studiumplus.de/ueber-uns/downloads/",
+          "local_path": "ueber-uns/downloads/index.html",
+          "title": "Downloads - StudiumPlus"
+        }
+      ]
     },
     {
       "id": "praxis-im-unternehmen",
-      "label": "Praxis Im Unternehmen",
+      "label": "Praxis im Unternehmen - StudiumPlus",
       "source_url": "https://studiumplus.de/duales-studium/im-studium/infos-fuer-studierende/praxis-im-unternehmen/",
       "local_path": "duales-studium/im-studium/infos-fuer-studierende/praxis-im-unternehmen/",
       "thumbnail": "thumbnails/praxis-im-unternehmen.png",
-      "cloned_at": "2026-02-25T16:34:09Z",
-      "pages_count": 0,
-      "pages": []
+      "cloned_at": "2026-02-25T21:41:15Z",
+      "pages_count": 3,
+      "pages": [
+        {
+          "source_url": "https://studiumplus.de/duales-studium/im-studium/infos-fuer-studierende/praxis-im-unternehmen/",
+          "local_path": "duales-studium/im-studium/infos-fuer-studierende/praxis-im-unternehmen/index.html",
+          "title": "Praxis im Unternehmen - StudiumPlus"
+        },
+        {
+          "source_url": "https://studiumplus.de/duales-studium/im-studium/infos-fuer-studierende/praxis-im-unternehmen/praxis-im-bachelor-studium/",
+          "local_path": "duales-studium/im-studium/infos-fuer-studierende/praxis-im-unternehmen/praxis-im-bachelor-studium/index.html",
+          "title": "Praxis im Bachelor-Studium - StudiumPlus"
+        },
+        {
+          "source_url": "https://studiumplus.de/duales-studium/im-studium/infos-fuer-studierende/praxis-im-unternehmen/praxis-im-master-studium/",
+          "local_path": "duales-studium/im-studium/infos-fuer-studierende/praxis-im-unternehmen/praxis-im-master-studium/index.html",
+          "title": "Praxis im Master-Studium - StudiumPlus"
+        }
+      ]
     },
     {
       "id": "campus-team",
-      "label": "Campus Team",
+      "label": "Campus-Team - StudiumPlus",
       "source_url": "https://studiumplus.de/ueber-uns/campus-team/",
       "local_path": "ueber-uns/campus-team/",
       "thumbnail": "thumbnails/campus-team.png",
-      "cloned_at": "2026-02-25T16:34:09Z",
-      "pages_count": 0,
-      "pages": []
+      "cloned_at": "2026-02-25T21:41:28Z",
+      "pages_count": 1,
+      "pages": [
+        {
+          "source_url": "https://studiumplus.de/ueber-uns/campus-team/",
+          "local_path": "ueber-uns/campus-team/index.html",
+          "title": "Campus-Team - StudiumPlus"
+        }
+      ]
     },
     {
       "id": "mein-weg-zu-studiumplus",
-      "label": "Mein Weg Zu Studiumplus",
+      "label": "Mein Weg zu StudiumPlus - StudiumPlus",
       "source_url": "https://studiumplus.de/duales-studium/vor-dem-studium/mein-weg-zu-studiumplus/",
       "local_path": "duales-studium/vor-dem-studium/mein-weg-zu-studiumplus/",
       "thumbnail": "thumbnails/mein-weg-zu-studiumplus.png",
-      "cloned_at": "2026-02-25T16:34:09Z",
-      "pages_count": 0,
-      "pages": []
+      "cloned_at": "2026-02-25T21:41:33Z",
+      "pages_count": 1,
+      "pages": [
+        {
+          "source_url": "https://studiumplus.de/duales-studium/vor-dem-studium/mein-weg-zu-studiumplus/",
+          "local_path": "duales-studium/vor-dem-studium/mein-weg-zu-studiumplus/index.html",
+          "title": "Mein Weg zu StudiumPlus - StudiumPlus"
+        }
+      ]
     }
   ]
 }
