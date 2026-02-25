@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudiumPlus – Partieller Website-Klon</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <h1>StudiumPlus – Partieller Website-Klon</h1>
+    <p>Übersicht der geklonten Bereiche</p>
+  </header>
+
+  <main id="app" class="cards">
+    <div class="loading" id="loading">Bereiche werden geladen&hellip;</div>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Quelle: <a href="https://studiumplus.de" target="_blank" rel="noopener">studiumplus.de</a>
+      &middot; Partieller Klon zu Demo- und Erprobungszwecken
+    </p>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var app = document.getElementById('app');
+
+      fetch('registry.json')
+        .then(function (res) {
+          if (!res.ok) throw new Error('registry.json konnte nicht geladen werden');
+          return res.json();
+        })
+        .then(function (registry) {
+          render(registry);
+        })
+        .catch(function (err) {
+          app.innerHTML =
+            '<div class="empty-state">Keine geklonten Bereiche gefunden.<br><small>' +
+            err.message +
+            '</small></div>';
+        });
+
+      function render(registry) {
+        var areas = registry.areas;
+        if (!areas || areas.length === 0) {
+          app.innerHTML =
+            '<div class="empty-state">Es wurden noch keine Bereiche geklont.<br>' +
+            'Führe <code>python scripts/clone.py &lt;URL&gt;</code> aus, um Bereiche hinzuzufügen.</div>';
+          return;
+        }
+
+        app.innerHTML = '';
+        areas.forEach(function (area) {
+          var card = document.createElement('a');
+          card.className = 'card';
+          card.href = 'viewer.html#' + area.local_path;
+
+          var thumbSrc = area.thumbnail || 'data:image/svg+xml,' +
+            encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180">' +
+              '<rect width="320" height="180" fill="#e0e0e0"/>' +
+              '<text x="160" y="95" text-anchor="middle" fill="#999" font-size="14">' +
+              'Kein Thumbnail</text></svg>');
+
+          var clonedDate = area.cloned_at
+            ? new Date(area.cloned_at).toLocaleDateString('de-DE', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })
+            : '–';
+
+          card.innerHTML =
+            '<img class="card-thumb" src="' + thumbSrc + '" alt="Vorschau: ' + escapeHtml(area.label) + '">' +
+            '<div class="card-body">' +
+            '  <div class="card-title">' + escapeHtml(area.label) + '</div>' +
+            '  <div class="card-meta">' + area.pages_count + ' Seite' + (area.pages_count !== 1 ? 'n' : '') + '</div>' +
+            '  <div class="card-meta">Geklont: ' + clonedDate + '</div>' +
+            '  <span class="card-btn">Anzeigen</span>' +
+            '</div>';
+
+          app.appendChild(card);
+        });
+      }
+
+      function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+      }
+    })();
+  </script>
+
+</body>
+</html>

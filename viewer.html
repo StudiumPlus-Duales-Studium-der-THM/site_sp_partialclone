@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Viewer – StudiumPlus Klon</title>
+  <link rel="stylesheet" href="assets/app.css">
+  <style>
+    /* Viewer-specific layout */
+    html, body { height: 100%; overflow: hidden; }
+    body { display: flex; flex-direction: column; }
+    .viewer-frame { flex: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation bar -->
+  <nav class="viewer-nav" id="navbar">
+    <a href="index.html" title="Zurück zur Übersicht">← Übersicht</a>
+    <span class="nav-label" id="nav-label">Lade&hellip;</span>
+    <a class="nav-source" id="nav-source" href="#" target="_blank" rel="noopener"></a>
+    <button class="btn-toggle" id="btn-hide" title="Rahmen ausblenden">Rahmen ausblenden</button>
+  </nav>
+
+  <!-- Content iframe -->
+  <iframe class="viewer-frame" id="viewer" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" src="about:blank"></iframe>
+
+  <!-- Floating restore button (hidden by default) -->
+  <button class="fab-restore" id="fab-restore" title="Rahmen einblenden">≡</button>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var navbar = document.getElementById('navbar');
+      var viewer = document.getElementById('viewer');
+      var navLabel = document.getElementById('nav-label');
+      var navSource = document.getElementById('nav-source');
+      var btnHide = document.getElementById('btn-hide');
+      var fabRestore = document.getElementById('fab-restore');
+
+      var registry = null;
+      var currentArea = null;
+
+      // ---- Frame toggle ----
+
+      btnHide.addEventListener('click', function () {
+        navbar.style.display = 'none';
+        fabRestore.style.display = 'flex';
+      });
+
+      fabRestore.addEventListener('click', function () {
+        navbar.style.display = '';
+        fabRestore.style.display = 'none';
+      });
+
+      // ---- Load registry and route ----
+
+      fetch('registry.json')
+        .then(function (res) {
+          if (!res.ok) throw new Error('registry.json nicht gefunden');
+          return res.json();
+        })
+        .then(function (data) {
+          registry = data;
+          route();
+        })
+        .catch(function (err) {
+          navLabel.textContent = 'Fehler: ' + err.message;
+        });
+
+      window.addEventListener('hashchange', route);
+
+      function route() {
+        var hash = location.hash.replace(/^#\/?/, '');
+        if (!hash) {
+          navLabel.textContent = 'Kein Bereich ausgewählt';
+          viewer.src = 'about:blank';
+          return;
+        }
+        // Ensure trailing slash
+        if (!hash.endsWith('/')) hash += '/';
+
+        if (!registry) return;
+
+        // Find matching area
+        currentArea = null;
+        for (var i = 0; i < registry.areas.length; i++) {
+          if (hash.indexOf(registry.areas[i].local_path) === 0 || registry.areas[i].local_path.indexOf(hash) === 0) {
+            currentArea = registry.areas[i];
+            break;
+          }
+        }
+
+        if (!currentArea) {
+          // Try direct load anyway
+          navLabel.textContent = hash;
+          navSource.textContent = '';
+          navSource.href = '#';
+          viewer.src = hash + 'index.html';
+          return;
+        }
+
+        navLabel.textContent = currentArea.label;
+        navSource.textContent = currentArea.source_url;
+        navSource.href = currentArea.source_url;
+        document.title = currentArea.label + ' – StudiumPlus Klon';
+
+        // Determine iframe src from hash
+        var iframeSrc = hash;
+        // If path ends with / append index.html
+        if (iframeSrc.endsWith('/')) {
+          iframeSrc += 'index.html';
+        }
+        viewer.src = iframeSrc;
+      }
+
+      // ---- iframe URL monitoring ----
+
+      setInterval(function () {
+        if (!currentArea) return;
+        try {
+          var iframeUrl = viewer.contentWindow.location.pathname;
+          // Update nav-source if navigated within area
+          if (iframeUrl && iframeUrl !== '/') {
+            var full = currentArea.source_url.replace(
+              new RegExp('^(https?://[^/]+).*'),
+              '$1'
+            ) + iframeUrl;
+            navSource.textContent = full;
+            navSource.href = full;
+          }
+        } catch (e) {
+          // Cross-origin – ignore
+        }
+      }, 1000);
+    })();
+  </script>
+
+</body>
+</html>
