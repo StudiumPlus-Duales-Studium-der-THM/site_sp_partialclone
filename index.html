@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudiumPlus – Partieller Website-Klon</title>
+  <link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+  <main class="container">
+    <h1>StudiumPlus – Partieller Website-Klon</h1>
+    <p class="subtitle">Übersicht der geklonten Bereiche</p>
+    <section id="cards" class="grid"></section>
+  </main>
+
+  <script>
+    async function loadRegistry() {
+      const response = await fetch('registry.json', { cache: 'no-store' });
+      return response.json();
+    }
+
+    function areaCard(area) {
+      const thumb = area.thumbnail || '';
+      const safePath = (area.local_path || '').replace(/^\/+/, '');
+      return `
+        <article class="card">
+          <img src="${thumb}" alt="Thumbnail für ${area.label}">
+          <div class="card-content">
+            <h2>${area.label}</h2>
+            <div class="card-meta">
+              <div>Seiten: ${area.pages_count ?? 0}</div>
+              <div>Geklont: ${area.cloned_at ?? '—'}</div>
+              <div><a href="${area.source_url}" target="_blank" rel="noopener">Quelle öffnen</a></div>
+            </div>
+            <a class="button" href="viewer.html#${safePath}">Anzeigen</a>
+          </div>
+        </article>
+      `;
+    }
+
+    (async () => {
+      const container = document.getElementById('cards');
+      try {
+        const registry = await loadRegistry();
+        const areas = Array.isArray(registry.areas) ? registry.areas : [];
+        if (!areas.length) {
+          container.innerHTML = '<p>Noch keine geklonten Bereiche vorhanden. Bitte zuerst scripts/clone.py ausführen.</p>';
+          return;
+        }
+        container.innerHTML = areas.map(areaCard).join('');
+      } catch (error) {
+        container.innerHTML = `<p>Registry konnte nicht geladen werden: ${error.message}</p>`;
+      }
+    })();
+  </script>
+</body>
+</html>

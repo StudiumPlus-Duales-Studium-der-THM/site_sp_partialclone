@@ -1,0 +1,86 @@
+{
+  "source": "https://studiumplus.de",
+  "last_updated": "2026-02-25T16:34:09Z",
+  "areas": [
+    {
+      "id": "studienangebot",
+      "label": "Studienangebot",
+      "source_url": "https://studiumplus.de/duales-studium/vor-dem-studium/studienangebot/",
+      "local_path": "duales-studium/vor-dem-studium/studienangebot/",
+      "thumbnail": "thumbnails/studienangebot.png",
+      "cloned_at": "2026-02-25T16:34:09Z",
+      "pages_count": 0,
+      "pages": []
+    },
+    {
+      "id": "betriebswirtschaft",
+      "label": "Betriebswirtschaft",
+      "source_url": "https://studiumplus.de/studiengaenge/betriebswirtschaft/",
+      "local_path": "studiengaenge/betriebswirtschaft/",
+      "thumbnail": "thumbnails/betriebswirtschaft.png",
+      "cloned_at": "2026-02-25T16:34:09Z",
+      "pages_count": 0,
+      "pages": []
+    },
+    {
+      "id": "freie-studienplaetze",
+      "label": "Freie Studienplaetze",
+      "source_url": "https://studiumplus.de/duales-studium/vor-dem-studium/freie-studienplaetze/",
+      "local_path": "duales-studium/vor-dem-studium/freie-studienplaetze/",
+      "thumbnail": "thumbnails/freie-studienplaetze.png",
+      "cloned_at": "2026-02-25T16:34:09Z",
+      "pages_count": 0,
+      "pages": []
+    },
+    {
+      "id": "connect",
+      "label": "Connect",
+      "source_url": "https://studiumplus.de/connect/",
+      "local_path": "connect/",
+      "thumbnail": "thumbnails/connect.png",
+      "cloned_at": "2026-02-25T16:34:09Z",
+      "pages_count": 0,
+      "pages": []
+    },
+    {
+      "id": "downloads",
+      "label": "Downloads",
+      "source_url": "https://studiumplus.de/ueber-uns/downloads/",
+      "local_path": "ueber-uns/downloads/",
+      "thumbnail": "thumbnails/downloads.png",
+      "cloned_at": "2026-02-25T16:34:09Z",
+      "pages_count": 0,
+      "pages": []
+    },
+    {
+      "id": "praxis-im-unternehmen",
+      "label": "Praxis Im Unternehmen",
+      "source_url": "https://studiumplus.de/duales-studium/im-studium/infos-fuer-studierende/praxis-im-unternehmen/",
+      "local_path": "duales-studium/im-studium/infos-fuer-studierende/praxis-im-unternehmen/",
+      "thumbnail": "thumbnails/praxis-im-unternehmen.png",
+      "cloned_at": "2026-02-25T16:34:09Z",
+      "pages_count": 0,
+      "pages": []
+    },
+    {
+      "id": "campus-team",
+      "label": "Campus Team",
+      "source_url": "https://studiumplus.de/ueber-uns/campus-team/",
+      "local_path": "ueber-uns/campus-team/",
+      "thumbnail": "thumbnails/campus-team.png",
+      "cloned_at": "2026-02-25T16:34:09Z",
+      "pages_count": 0,
+      "pages": []
+    },
+    {
+      "id": "mein-weg-zu-studiumplus",
+      "label": "Mein Weg Zu Studiumplus",
+      "source_url": "https://studiumplus.de/duales-studium/vor-dem-studium/mein-weg-zu-studiumplus/",
+      "local_path": "duales-studium/vor-dem-studium/mein-weg-zu-studiumplus/",
+      "thumbnail": "thumbnails/mein-weg-zu-studiumplus.png",
+      "cloned_at": "2026-02-25T16:34:09Z",
+      "pages_count": 0,
+      "pages": []
+    }
+  ]
+}
